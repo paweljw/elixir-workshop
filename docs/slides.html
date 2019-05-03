@@ -7,8 +7,10 @@
     <title>Warsztaty - Elixir</title>
     <link rel="stylesheet" href="./css/reveal.css" />
     <link rel="stylesheet" href="./_assets/./slides/assets/style.css" id="theme" />
-    <link rel="stylesheet" href="./css/highlight/zenburn.css" />
+    <link rel="stylesheet" href="./css/highlight/monokai.css" />
     <link rel="stylesheet" href="./css/print/paper.css" type="text/css" media="print" />
+    <link rel="stylesheet" href="./_assets/slides/assets/impact.css" />
+    <link rel="stylesheet" href="./_assets/slides/assets/style.css" />
 
   </head>
   <body>
@@ -30,7 +32,6 @@
 
 <aside class="notes"><p>Elixir. Co to w ogóle jest?</p>
 </aside></script></section><section data-markdown><script type="text/template">
-
 > Elixir is a dynamic, functional language designed for building scalable and maintainable applications.
 
 > Elixir leverages the Erlang VM, known for running low-latency, distributed and fault-tolerant systems (...)
@@ -39,7 +40,6 @@
 
 <aside class="notes"><p>Na stronie elixir lang org przeczytamy ze jest to dynamiczny, funkcjonalny jezyk do tworzenia skalowalnych i utrzymywalnych aplikacji. I ze jest zbudowany w oparciu o Erlang VM.</p>
 </aside></script></section><section data-markdown><script type="text/template">
-
 # Erlang
 
 * telekomy
@@ -48,9 +48,215 @@
 
 &mdash; erlang.org
 
-<aside class="notes"><p>odpakujmy to moze od konca. Co to jest ten Erlang?</p>
+<aside class="notes"><p>odpakujmy to moze od konca. Co to jest ten Erlang? Do kogo jest skierowany?</p>
+</aside></script></section><section data-markdown><script type="text/template">
+## Kto używa Erlanga?
+
+* Facebook
+* WhatsApp
+* T-Mobile
+* Motorola
+* Ericsson
+</script></section><section data-markdown><script type="text/template">
+## Co używa Erlanga?
+
+* RabbitMQ
+* CouchDB
+* Ejabberd
+</script></section><section data-markdown><script type="text/template">
+```erlang
+%% https://github.com/ninenines/cowboy/blob/master/src/cowboy_http2.erl
+
+-spec init(pid(), ranch:ref(), inet:socket(), module(),
+	ranch_proxy_header:proxy_info() | undefined, cowboy:opts(),
+	{inet:ip_address(), inet:port_number()}, {inet:ip_address(), inet:port_number()},
+	binary() | undefined, binary()) -> ok.
+init(Parent, Ref, Socket, Transport, ProxyHeader, Opts, Peer, Sock, Cert, Buffer) ->
+	{ok, Preface, HTTP2Machine} = cow_http2_machine:init(server, Opts),
+	State = set_timeout(#state{parent=Parent, ref=Ref, socket=Socket,
+		transport=Transport, proxy_header=ProxyHeader,
+		opts=Opts, peer=Peer, sock=Sock, cert=Cert,
+		http2_init=sequence, http2_machine=HTTP2Machine}),
+	Transport:send(Socket, Preface),
+	case Buffer of
+		<<>> -> loop(State, Buffer);
+		_ -> parse(State, Buffer)
+	end.
+```
+
+<aside class="notes"><p>Problem jest taki, ze erlang wyglada o tak.</p>
+</aside></script></section></section><section ><section data-markdown><script type="text/template">
+# Elixir
+
+* "Cukier" nad składnią Erlanga
+* Kompiluje się do BEAM (bytecode dla Erlang VM)
+* Sponsorowany przez Plataformatec
+</script></section><section data-markdown><script type="text/template">
+# Skalowalność
+
+* "lekkie" wątki (nie OS threads)
+* rozwiązanie problemów współbieżności (immutability, message passing)
+* izolacja - uproszczone GC
+
+W konsekwencji - lepsze wykorzystanie zasobów maszyny
+</script></section><section data-markdown><script type="text/template">
+## Odporność na błędy
+
+* _"things will go wrong"_
+* rozwiązanie - supervisors
+
+<aside class="notes"><p>aplikacja w Elixirze składa się z tzw. supervision tree - supervisorów które mogą mieć pod sobą inne supervisory lub grupy dzieci. Jak coś klęknie supervisor restartuje aplikację do znanego dobrego stanu (reinicjalizuje odpowiednią część drzewa)</p>
+</aside></script></section><section data-markdown><script type="text/template">
+## Dynamizm
+
+* Nie ma silnego typowania
+* Jest pattern matching
+* Są guard clauses
+* Są definicje struktur
+</script></section><section data-markdown><script type="text/template">
+## Functional programming
+
+* Dane nie mutują
+* Nie ma obiektów
+* Nie ma stanów
+* Mamy takie przyjemności jak destrukturyzacja (przez pattern matching) i pipe operator `|>`
+</script></section><section data-markdown><script type="text/template">
+## Community
+
+* Zamiast `bundle` jest `mix`
+* Zamiast `rubygems.org` jest `hex.pm`
+* Zamiast `Rubyist` jest `Alchemist` 😉
+</script></section></section><section ><section data-markdown><script type="text/template">
+## Elixir: pierwsze 5 minut
+</script></section><section data-markdown><script type="text/template">
+### We can into Hello World
+
+```elixir
+IO.puts "Hello world"
+```
+
+<aside class="notes"><p>IO to modul, nie obiekt!</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Co to jest?
+
+```elixir
+['foo', 123, :bar]
+```
+
+<br/>
+
+<aside class="notes"><p>to jest lista, nie tablica!</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Co to jest?
+
+```elixir
+['foo', 123, :bar]
+```
+
+https://hexdocs.pm/elixir/List.html
+</script></section><section data-markdown><script type="text/template">
+### Co to jest?
+
+```elixir
+:foo
+```
+
+<br/>
+
+<aside class="notes"><p>to jest atom, nie symbol!</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Co to jest?
+
+```elixir
+:foo
+```
+
+https://hexdocs.pm/elixir/Atom.html
+</script></section><section data-markdown><script type="text/template">
+### Co to jest?
+
+```elixir
+%{name: "Paweł", surname: "Wal", age: 28, alchemist: :uhhh}
+```
+
+<br/>
+
+<aside class="notes"><p>to jest mapa, nie hash!</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Co to jest?
+
+```elixir
+%{name: "Paweł", surname: "Wal", age: 28, alchemist: :uhhh}
+```
+
+https://hexdocs.pm/elixir/Map.html
+</script></section><section data-markdown><script type="text/template">
+### Dokończ zwrotkę
+
+```elixir
+person = %{name: "Paweł", surname: "Wal", age: 28}
+%{name: name} = person
+IO.puts name
+```
+
+<aside class="notes"><p>sprawdźmy w iex</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Programista wchodzi do baru
+
+```elixir
+programmer = %{name: "Paweł", surname: "Wal", age: 28}
+
+def a_programmer_walks_into_a_bar(%{age: age}) when age >= 18 do
+  IO.puts "To co zwykle?"
+end
+
+a_programmer_walks_into_a_bar(programmer)
+```
+
+<aside class="notes"><p>sprawdźmy w iex - bum!</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Programista wchodzi do baru
+
+```elixir
+programmer = %{name: "Paweł", surname: "Wal", age: 28}
+
+defmodule Bar do
+  def a_programmer_walks_into_a_bar(%{age: age}) when age >= 18 do
+    IO.puts "To co zwykle?"
+  end
+end
+
+Bar.a_programmer_walks_into_a_bar(programmer)
+```
+
+<aside class="notes"><p>sprawdźmy w iex</p>
+</aside></script></section><section data-markdown><script type="text/template">
+#### Młodszy programista wchodzi do baru
+
+```elixir
+programmer = %{name: "Paweł", surname: "Wal", age: 16}
+
+defmodule Bar do
+  def a_programmer_walks_into_a_bar(%{age: age}) when age >= 18 do
+    IO.puts "To co zwykle?"
+  end
+end
+
+Bar.a_programmer_walks_into_a_bar(programmer)
+```
+
+<aside class="notes"><p>sprawdźmy w iex</p>
 </aside></script></section></section><section  data-markdown><script type="text/template">
-I tak dalej
+### Czas na praktykę!
+
+<img src="./assets/shoot.gif">
+</script></section><section  data-markdown><script type="text/template">
+# Pytania?
+
+https://paweljw.github.io/elixir-workshop
+https://github.com/paweljw/elixir-workshop
+</script></section><section  data-markdown><script type="text/template">
+# [APLAUZ]
 </script></section></div>
     </div>
 
