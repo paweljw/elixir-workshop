@@ -6,7 +6,7 @@
   "scripts": {
     "start": "reveal-md slides/slides.md -w",
     "build:pdf": "reveal-md slides/slides.md --print dist/slides.pdf",
-    "build:release": "reveal-md slides/slides.md --css slides/assets/impact.css,slides/assets/style.css --static docs && mkdir -p docs/_assets/slides/assets && cp -R slides/assets/* docs/_assets/slides/assets && mkdir -p docs/assets && cp -R slides/assets/* docs/assets"
+    "build:release": "reveal-md slides/slides.md --highlight-theme monokai --css slides/assets/impact.css,slides/assets/style.css --static docs && mkdir -p docs/_assets/slides/assets && cp -R slides/assets/* docs/_assets/slides/assets && mkdir -p docs/assets && cp -R slides/assets/* docs/assets"
   },
   "devDependencies": {
     "reveal-md": "^3.0.4"
