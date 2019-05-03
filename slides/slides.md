@@ -292,6 +292,22 @@ Note: sprawdźmy w iex
 
 ---
 
+### Testy i doctesty
+
+---
+
+### Debugger
+
+---
+
+### Process, Agent i Genserver
+
+---
+
+### call, cast i info
+
+---
+
 # Pytania?
 
 https://paweljw.github.io/elixir-workshop
