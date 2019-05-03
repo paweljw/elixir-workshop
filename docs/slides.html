@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+
+    <title>Warsztaty - Elixir</title>
+    <link rel="stylesheet" href="./css/reveal.css" />
+    <link rel="stylesheet" href="./_assets/./slides/assets/style.css" id="theme" />
+    <link rel="stylesheet" href="./css/highlight/zenburn.css" />
+    <link rel="stylesheet" href="./css/print/paper.css" type="text/css" media="print" />
+
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides"><section  data-markdown><script type="text/template">
+
+<!-- .slide: data-background="./assets/codest-opener.svg" id="opener" -->
+
+# Elixir w praktyce
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+## Pawel J. Wal @ Codest 2019
+</script></section><section ><section data-markdown><script type="text/template">
+# Elixir
+
+<aside class="notes"><p>Elixir. Co to w ogóle jest?</p>
+</aside></script></section><section data-markdown><script type="text/template">
+
+> Elixir is a dynamic, functional language designed for building scalable and maintainable applications.
+
+> Elixir leverages the Erlang VM, known for running low-latency, distributed and fault-tolerant systems (...)
+
+&mdash; elixir-lang.org
+
+<aside class="notes"><p>Na stronie elixir lang org przeczytamy ze jest to dynamiczny, funkcjonalny jezyk do tworzenia skalowalnych i utrzymywalnych aplikacji. I ze jest zbudowany w oparciu o Erlang VM.</p>
+</aside></script></section><section data-markdown><script type="text/template">
+
+# Erlang
+
+* telekomy
+* bankowość
+* instant messaging
+
+&mdash; erlang.org
+
+<aside class="notes"><p>odpakujmy to moze od konca. Co to jest ten Erlang?</p>
+</aside></script></section></section><section  data-markdown><script type="text/template">
+I tak dalej
+</script></section></div>
+    </div>
+
+    <script src="./lib/js/head.min.js"></script>
+    <script src="./js/reveal.js"></script>
+
+    <script>
+      function extend() {
+        var target = {};
+        for (var i = 0; i < arguments.length; i++) {
+          var source = arguments[i];
+          for (var key in source) {
+            if (source.hasOwnProperty(key)) {
+              target[key] = source[key];
+            }
+          }
+        }
+        return target;
+      }
+
+      // Optional libraries used to extend on reveal.js
+      var deps = [
+        { src: './lib/js/classList.js', condition: function() { return !document.body.classList; } },
+        { src: './plugin/markdown/marked.js', condition: function() { return !!document.querySelector('[data-markdown]'); } },
+        { src: './plugin/markdown/markdown.js', condition: function() { return !!document.querySelector('[data-markdown]'); } },
+        { src: './plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+        { src: './plugin/zoom-js/zoom.js', async: true },
+        { src: './plugin/notes/notes.js', async: true },
+        { src: './plugin/math/math.js', async: true }
+      ];
+
+      // default options to init reveal.js
+      var defaultOptions = {
+        controls: true,
+        progress: true,
+        history: true,
+        center: true,
+        transition: 'default', // none/fade/slide/convex/concave/zoom
+        dependencies: deps
+      };
+
+      // options from URL query string
+      var queryOptions = Reveal.getQueryHash() || {};
+
+      var options = extend(defaultOptions, {"transition":"fade"}, queryOptions);
+    </script>
+
+
+    <script>
+      Reveal.initialize(options);
+    </script>
+  </body>
+</html>

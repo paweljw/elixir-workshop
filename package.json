@@ -1,0 +1,14 @@
+{
+  "name": "elixir-workshop",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "reveal-md slides/slides.md -w",
+    "build:pdf": "reveal-md slides/slides.md --print dist/slides.pdf",
+    "build:release": "reveal-md slides/slides.md --static docs"
+  },
+  "devDependencies": {
+    "reveal-md": "^3.0.4"
+  }
+}
