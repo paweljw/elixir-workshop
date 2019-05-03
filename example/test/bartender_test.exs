@@ -1,8 +1,4 @@
 defmodule BartenderTest do
   use ExUnit.Case
-  doctest Bar
-
-  test "greets the world" do
-    assert Bar.hello() == :world
-  end
+  doctest Bar.Bartender
 end

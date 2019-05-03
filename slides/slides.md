@@ -308,6 +308,10 @@ Note: sprawdźmy w iex
 
 ---
 
+### Supervisors
+
+---
+
 # Pytania?
 
 https://paweljw.github.io/elixir-workshop

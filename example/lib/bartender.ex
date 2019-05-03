@@ -15,7 +15,7 @@ defmodule Bar.Bartender do
 
   ## Examples
 
-      iex> Bar.drink_list
+      iex> Bar.Bartender.drink_list
       ["Tyskie - 0,3l", "Tyskie - 0.5l", "Tyskie - 0,75l", "Tyskie - 2,5l",
       "Żywiec - 0,3l", "Żywiec - 0.5l", "Żywiec - 0,75l", "Żywiec - 2,5l",
       "Kasztelan - 0,3l", "Kasztelan - 0.5l", "Kasztelan - 0,75l",
@@ -33,6 +33,9 @@ defmodule Bar.Bartender do
     end
   end
 
+  @doc """
+  Pours a random drink.
+  """
   def pour_me_another do
     {[hand | _], _} = drink_list() |> randomize |> Enum.split(1)
     hand
