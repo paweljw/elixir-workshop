@@ -97,7 +97,7 @@ Note: Problem jest taki, ze erlang wyglada o tak.
 
 ----
 
-# Skalowalność
+## Skalowalność
 
 * "lekkie" wątki (nie OS threads)
 * rozwiązanie problemów współbieżności (immutability, message passing)
@@ -292,23 +292,196 @@ Note: sprawdźmy w iex
 
 ---
 
-### Testy i doctesty
+### Testy
+
+* `bundle exec rspec` => `mix test`
+* `bundle exec rspec --format documentation` => `mix test --trace`
+* `RSpec` => `ExUnit`
+
+https://hexdocs.pm/ex_unit/ExUnit.html
+
+----
+
+### Doctests
+
+* generowane z dokumentacji (sekcje `## Examples`)
+* nie mymagają `ex_docs` (ale czemu nie!)
+* przykłady - jak sekcja `iex`
+* dokumentacja to testy, testujemy też dokumentację
+
+Note: same plusy - dokumentacja jest aktualna, stanowi testy, jeśli docsy kłamią to testy nie przechodzą
 
 ---
+
+### Debugowanie
+
+* `IO.puts`
+
+----
+
+### Debugowanie ;)
+
+* `IEx.pry` (musimy wcześniej `require IEx`)
+* podobny do gema `pry`
+* nie tak dobry dostęp do lokalnego stanu
+
+----
 
 ### Debugger
 
+* Elixir posiada wbudowany graficzny debugger
+* można go używać wprost z `iex`
+
+----
+
+### Debugger
+
+* `:debugger.start()` - start debuggera
+* `:int.ni(NaszModul)` - instrumentacja modułu
+* `:int.break(NaszModul, 42)` - breakpoint w linii 42
+
 ---
 
-### Process, Agent i Genserver
+### Process
 
----
+* Wszystko w Elixirze dzieje się w procesach
+* Procesy są odizolowane i porozumiewają się przez message passing
+* Nie tylko współbieżność ale i rozproszenie
+* Nie OS processes!
+
+https://elixir-lang.org/getting-started/processes.html
+
+Note: message passing nie musi odbywać się lokalnie, klaster eliksirowy moze byc na wielu maszynach i wysylac sobie wiadomosci po sieci
+
+----
+
+### Process
+
+* Process ma wewnętrzny stan 😮
+* Stan Process zmieniamy via message passing
+
+----
+
+### Task
+
+* Wrapper nad funkcją `spawn` tworzącą procesy
+* Dostarcza lepszy error reporting
+
+----
+
+### Task ze stanem
+
+```elixir
+defmodule KV do
+  def start_link do
+    Task.start_link(fn -> loop(%{}) end)
+  end
+
+  defp loop(map) do
+    receive do
+      {:get, key, caller} ->
+        send caller, Map.get(map, key)
+        loop(map)
+      {:put, key, value} ->
+        loop(Map.put(map, key, value))
+    end
+  end
+end
+```
+
+Note: stan przechowujemy bo wywołujemy na samych sobie metodę w której parametrem jest nasz stan
+To nie jest busy loop! Receive pasywnie czeka na wiadomosc
+
+----
+
+### Task ze stanem
+
+```elixir
+iex> {:ok, pid} = KV.start_link
+{:ok, #PID<0.62.0>}
+iex> send pid, {:put, :hello, :world}
+{:put, :hello, :world}
+iex> send pid, {:get, :hello, self()}
+{:get, :hello, #PID<0.41.0>}
+iex> flush()
+:world
+:ok
+```
+
+Note: usage. Zeby na glownym procesie odebrac musimy zflushowac wiadomosci (nie mamy receive)
+
+----
+
+### Agent
+
+* Agent to wrapper nad Task
+* Dostarcza uproszczonego DSLa do powyższego zadania
+
+https://elixir-lang.org/getting-started/mix-otp/agent.html
+
+----
+
+### Agent
+
+```
+iex> {:ok, agent} = Agent.start_link fn -> [] end
+{:ok, #PID<0.57.0>}
+iex> Agent.update(agent, fn list -> ["eggs" | list] end)
+:ok
+iex> Agent.get(agent, fn list -> list end)
+["eggs"]
+iex> Agent.stop(agent)
+:ok
+```
+
+Note: Agent ma start, update i stop - prosciej go uzyc
+
+----
+
+### GenServer
+
+* "Generic server"
+* W praktyce do długo żyjących zadań użyjemy GenServera
+* GenServery są "przemysłowo" stabilne
+* Obsługują kilka rodzajów wiadomości
+
+https://elixir-lang.org/getting-started/mix-otp/genserver.html
+
+----
 
 ### call, cast i info
 
----
+* `call` - synchroniczny; serwer musi odpowiedzieć (backpressure)
+* `cast` - asynchroniczny, brak odpowiedzi
+* `info` - generalne wiadomości, np. komenda zatrzymania
 
-### Supervisors
+----
+
+### Supervisor
+
+* W Elixirze nie programujemy defensywnie
+* _"Let it crash"_ - wróćmy do pewnego, dobrego stanu
+* Ale jak padnie, kto to podniesie?
+
+https://elixir-lang.org/getting-started/mix-otp/supervisor-and-application.html
+
+----
+
+### Supervisor
+
+* Supervisor ma procesy-dzieci
+* Różne strategie podnoszenia dzieci
+* Najprostsza `:one_for_one`
+
+Note: one_for_one mowi ze jak jedno dziecko padnie restartujemy tylko to dziecko. one_for_all na przyklad powoduje ze jak jedno dziecko padnie restartujemy wszystkie
+
+----
+
+### Application
+
+* Pozwala nam zdefiniować "entrypoint" aplikacji
+* W praktyce generuje Erlangowy `.app` przez `mix compile`
+* Tak robilibyśmy deployment
 
 ---
 

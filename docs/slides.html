@@ -92,7 +92,7 @@ init(Parent, Ref, Socket, Transport, ProxyHeader, Opts, Peer, Sock, Cert, Buffer
 * Kompiluje się do BEAM (bytecode dla Erlang VM)
 * Sponsorowany przez Plataformatec
 </script></section><section data-markdown><script type="text/template">
-# Skalowalność
+## Skalowalność
 
 * "lekkie" wątki (nie OS threads)
 * rozwiązanie problemów współbieżności (immutability, message passing)
@@ -250,17 +250,164 @@ Bar.a_programmer_walks_into_a_bar(programmer)
 ### Czas na praktykę!
 
 <img src="./assets/shoot.gif">
-</script></section><section  data-markdown><script type="text/template">
-### Testy i doctesty
-</script></section><section  data-markdown><script type="text/template">
+</script></section><section ><section data-markdown><script type="text/template">
+### Testy
+
+* `bundle exec rspec` => `mix test`
+* `bundle exec rspec --format documentation` => `mix test --trace`
+* `RSpec` => `ExUnit`
+
+https://hexdocs.pm/ex_unit/ExUnit.html
+</script></section><section data-markdown><script type="text/template">
+### Doctests
+
+* generowane z dokumentacji (sekcje `## Examples`)
+* nie mymagają `ex_docs` (ale czemu nie!)
+* przykłady - jak sekcja `iex`
+* dokumentacja to testy, testujemy też dokumentację
+
+<aside class="notes"><p>same plusy - dokumentacja jest aktualna, stanowi testy, jeśli docsy kłamią to testy nie przechodzą</p>
+</aside></script></section></section><section ><section data-markdown><script type="text/template">
+### Debugowanie
+
+* `IO.puts`
+</script></section><section data-markdown><script type="text/template">
+### Debugowanie ;)
+
+* `IEx.pry` (musimy wcześniej `require IEx`)
+* podobny do gema `pry`
+* nie tak dobry dostęp do lokalnego stanu
+</script></section><section data-markdown><script type="text/template">
 ### Debugger
-</script></section><section  data-markdown><script type="text/template">
-### Process, Agent i Genserver
-</script></section><section  data-markdown><script type="text/template">
+
+* Elixir posiada wbudowany graficzny debugger
+* można go używać wprost z `iex`
+</script></section><section data-markdown><script type="text/template">
+### Debugger
+
+* `:debugger.start()` - start debuggera
+* `:int.ni(NaszModul)` - instrumentacja modułu
+* `:int.break(NaszModul, 42)` - breakpoint w linii 42
+</script></section></section><section ><section data-markdown><script type="text/template">
+### Process
+
+* Wszystko w Elixirze dzieje się w procesach
+* Procesy są odizolowane i porozumiewają się przez message passing
+* Nie tylko współbieżność ale i rozproszenie
+* Nie OS processes!
+
+https://elixir-lang.org/getting-started/processes.html
+
+<aside class="notes"><p>message passing nie musi odbywać się lokalnie, klaster eliksirowy moze byc na wielu maszynach i wysylac sobie wiadomosci po sieci</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Process
+
+* Process ma wewnętrzny stan 😮
+* Stan Process zmieniamy via message passing
+</script></section><section data-markdown><script type="text/template">
+### Task
+
+* Wrapper nad funkcją `spawn` tworzącą procesy
+* Dostarcza lepszy error reporting
+</script></section><section data-markdown><script type="text/template">
+### Task ze stanem
+
+```elixir
+defmodule KV do
+  def start_link do
+    Task.start_link(fn -> loop(%{}) end)
+  end
+
+  defp loop(map) do
+    receive do
+      {:get, key, caller} ->
+        send caller, Map.get(map, key)
+        loop(map)
+      {:put, key, value} ->
+        loop(Map.put(map, key, value))
+    end
+  end
+end
+```
+
+<aside class="notes"><p>stan przechowujemy bo wywołujemy na samych sobie metodę w której parametrem jest nasz stan
+To nie jest busy loop! Receive pasywnie czeka na wiadomosc</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Task ze stanem
+
+```elixir
+iex> {:ok, pid} = KV.start_link
+{:ok, #PID<0.62.0>}
+iex> send pid, {:put, :hello, :world}
+{:put, :hello, :world}
+iex> send pid, {:get, :hello, self()}
+{:get, :hello, #PID<0.41.0>}
+iex> flush()
+:world
+:ok
+```
+
+<aside class="notes"><p>usage. Zeby na glownym procesie odebrac musimy zflushowac wiadomosci (nie mamy receive)</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Agent
+
+* Agent to wrapper nad Task
+* Dostarcza uproszczonego DSLa do powyższego zadania
+
+https://elixir-lang.org/getting-started/mix-otp/agent.html
+</script></section><section data-markdown><script type="text/template">
+### Agent
+
+```
+iex> {:ok, agent} = Agent.start_link fn -> [] end
+{:ok, #PID<0.57.0>}
+iex> Agent.update(agent, fn list -> ["eggs" | list] end)
+:ok
+iex> Agent.get(agent, fn list -> list end)
+["eggs"]
+iex> Agent.stop(agent)
+:ok
+```
+
+<aside class="notes"><p>Agent ma start, update i stop - prosciej go uzyc</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### GenServer
+
+* "Generic server"
+* W praktyce do długo żyjących zadań użyjemy GenServera
+* GenServery są "przemysłowo" stabilne
+* Obsługują kilka rodzajów wiadomości
+
+https://elixir-lang.org/getting-started/mix-otp/genserver.html
+</script></section><section data-markdown><script type="text/template">
 ### call, cast i info
-</script></section><section  data-markdown><script type="text/template">
-### Supervisors
-</script></section><section  data-markdown><script type="text/template">
+
+* `call` - synchroniczny; serwer musi odpowiedzieć (backpressure)
+* `cast` - asynchroniczny, brak odpowiedzi
+* `info` - generalne wiadomości, np. komenda zatrzymania
+</script></section><section data-markdown><script type="text/template">
+### Supervisor
+
+* W Elixirze nie programujemy defensywnie
+* _"Let it crash"_ - wróćmy do pewnego, dobrego stanu
+* Ale jak padnie, kto to podniesie?
+
+https://elixir-lang.org/getting-started/mix-otp/supervisor-and-application.html
+</script></section><section data-markdown><script type="text/template">
+### Supervisor
+
+* Supervisor ma procesy-dzieci
+* Różne strategie podnoszenia dzieci
+* Najprostsza `:one_for_one`
+
+<aside class="notes"><p>one_for_one mowi ze jak jedno dziecko padnie restartujemy tylko to dziecko. one_for_all na przyklad powoduje ze jak jedno dziecko padnie restartujemy wszystkie</p>
+</aside></script></section><section data-markdown><script type="text/template">
+### Application
+
+* Pozwala nam zdefiniować "entrypoint" aplikacji
+* W praktyce generuje Erlangowy `.app` przez `mix compile`
+* Tak robilibyśmy deployment
+</script></section></section><section  data-markdown><script type="text/template">
 # Pytania?
 
 https://paweljw.github.io/elixir-workshop
