@@ -222,6 +222,28 @@ https://hexdocs.pm/elixir/Map.html
 
 ----
 
+### Co to jest?
+
+```elixir
+{"Paweł", 28, :uhhh}
+```
+
+<br/>
+
+Note: to jest tupla, zauwaz brak % z przodu
+
+----
+
+### Co to jest?
+
+```elixir
+{"Paweł", 28, :uhhh}
+```
+
+https://hexdocs.pm/elixir/Tuple.html
+
+----
+
 ### Dokończ zwrotkę
 
 ```elixir
