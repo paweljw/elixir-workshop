@@ -521,6 +521,8 @@ Note: one_for_one mowi ze jak jedno dziecko padnie restartujemy tylko to dziecko
 https://paweljw.github.io/elixir-workshop
 https://github.com/paweljw/elixir-workshop
 
+@paweljwal
+
 ---
 
 # [APLAUZ]
