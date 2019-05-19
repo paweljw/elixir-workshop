@@ -19,6 +19,15 @@ highlightTheme: 'monokai'
 
 ---
 
+## Zasady
+
+* MINASWAN!
+* Pytaj, przerywaj, poprawiaj
+* "Nie wiem" jest OK
+* Bez telefonów proszę
+
+---
+
 # Elixir
 
 Note: Elixir. Co to w ogóle jest?
